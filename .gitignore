@@ -1,2 +1,4 @@
 .vscode/
 bin/
+src/arcpch.h.gch
+src/ico.o
