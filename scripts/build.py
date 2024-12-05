@@ -8,11 +8,14 @@ def get_files(path: str, ext: tuple):
 def join(lst, prefix="", separator=" "):
     return separator.join([prefix + i for i in lst])
 
+def sys(cmd):
+    print(cmd)
+    os.system(cmd)
+
 CONFIG = {
     "SRC_PATH": "src",
     "ICON_PATH": "src/ico.o",
     "INCLUDES": ["src/", "src/shared/"],
-    "DEFINES": ["VERSION=1"],
     "EXTRAS": "-lws2_32",
     "STD": "c++20",
     "OUTPATH": "bin\\arc.exe",
@@ -22,12 +25,10 @@ CONFIG = {
         ("src/ico.o", "windres src/ico.rc -O coff -o src/ico.o") # create ico.o containing the data for arc icon
     ]
 }
-COMMON = f"{join(CONFIG["INCLUDES"], "-I")} {CONFIG["EXTRAS"]} {join(CONFIG["DEFINES"], "-D")} {CONFIG["OPTIMIZATION"]} -std={CONFIG["STD"]} -Wall"
+COMMON = f"{join(CONFIG["INCLUDES"], "-I")} {CONFIG["EXTRAS"]} {CONFIG["OPTIMIZATION"]} -std={CONFIG["STD"]} -Wall"
 
-[os.system(cmd) for path, cmd in CONFIG["PRECOMPILES"] if not os.path.isfile(path)]
+[sys(cmd) for path, cmd in CONFIG["PRECOMPILES"] if not os.path.isfile(path)]
 
 obj_files = get_files(CONFIG["SRC_PATH"], (".cpp", ".c"))
-COMMAND = f"g++ {CONFIG["ICON_PATH"]} {join(obj_files)} {COMMON} -o {CONFIG["OUTPATH"]}"
-
-print(COMMAND)
-os.system(COMMAND)
+sys(f"g++ {CONFIG["ICON_PATH"]} {join(obj_files)} {COMMON} -o {CONFIG["OUTPATH"]}")
+os.system(f"call {CONFIG["OUTPATH"]}")
