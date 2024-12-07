@@ -18,7 +18,7 @@ CONFIG = {
     "INCLUDES": ["src/", "src/core/", "src/shared/", "src/vendor/"],
     "EXTRAS": "-lws2_32",
     "STD": "c++20",
-    "OUTPATH": "bin\\arc.exe",
+    "OUTPATH": "bin2\\arc.exe",
     "OPTIMIZATION": "-O2",
     "PRECOMPILES": [
         ("src/arcpch.h.gch", "g++ src/arcpch.h"), # compile arc precompiled headers
@@ -32,9 +32,11 @@ if len(sys.argv) <= 1:
 
     obj_files = get_files(CONFIG["SRC_PATH"], (".cpp", ".c"))
 
-    if os.path.isdir("bin"):
-        shutil.rmtree("bin/")
-        os.mkdir("bin")
+    if os.path.isdir(os.path.dirname(CONFIG["OUTPATH"])):
+        shutil.rmtree(f"{os.path.dirname(CONFIG["OUTPATH"])}/")
+
+    if not os.path.isdir(os.path.dirname(CONFIG["OUTPATH"])):
+        os.mkdir(os.path.dirname(CONFIG["OUTPATH"]))
 
     system(f"g++ {CONFIG["ICON_PATH"]} {join(obj_files)} {COMMON} -o {CONFIG["OUTPATH"]}")
 
