@@ -1,4 +1,4 @@
-import sys, os
+import shutil, sys, os
 
 # https://stackoverflow.com/a/18351977/18121288
 # Though not widely known, str.endswith also accepts a tuple. You don't need to loop.
@@ -32,7 +32,10 @@ if len(sys.argv) <= 1:
 
     obj_files = get_files(CONFIG["SRC_PATH"], (".cpp", ".c"))
 
-    os.remove(CONFIG["OUTPATH"]) if os.path.isfile(CONFIG["OUTPATH"]) else None
+    if os.path.isdir("bin"):
+        shutil.rmtree("bin/")
+        os.mkdir("bin")
+
     system(f"g++ {CONFIG["ICON_PATH"]} {join(obj_files)} {COMMON} -o {CONFIG["OUTPATH"]}")
 
 os.system(f"call {CONFIG["OUTPATH"]}")
