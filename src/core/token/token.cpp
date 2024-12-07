@@ -124,9 +124,6 @@ namespace lex
 			}
 		}
 
-		for (std::vector<token>::size_type i = 0; i < tokens.size(); i++)
-			std::cout << "name: [" << tokens[i].name << "]\ntype: " << tokens[i].type << "\n\n";
-
 		return tokens;
 	}
 }
