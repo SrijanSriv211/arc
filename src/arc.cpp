@@ -1,15 +1,27 @@
 #include "arcpch.h"
 #include "arc.h"
 
-#include "fileio/foldersystem.h"
-#include "console/console.h"
+#include "fileio/filesystem.h"
 #include "datetime/datetime.h"
-#include "strings/strings.h"
-#include "token/token.h"
+#include "console/console.h"
 
 namespace arc
 {
     std::string current_path;
+    std::string arc_env_path = std::filesystem::current_path().string();
+
+    // https://stackoverflow.com/q/50889647/18121288
+    std::string get_root_path()
+    {
+        char buffer[MAX_PATH];
+        // in the stackoverflow thread, the code snippet contained `GetModuleFileName` change it to `GetModuleFileNameA`.
+        // `GetModuleFileName` is a macro that resolves to either `GetModuleFileNameA` or `GetModuleFileNameW` based on
+        // the project's character set setting. `GetModuleFileNameA` is the ANSI version that works with char strings.
+        //*NOTE: explanation by chatgpt
+        GetModuleFileNameA(NULL, buffer, MAX_PATH);
+        std::string::size_type pos = std::string(buffer).find_last_of("\\/");
+        return (pos == std::string::npos) ? "" : std::string(buffer).substr(0, pos);
+    }
 
     void clear_console()
     {
@@ -38,40 +50,5 @@ namespace arc
         }
 
         console::print(">~ ", console::color::GRAY, false);
-    }
-
-    int is_running()
-    {
-        std::string input;
-
-        while(true)
-        {
-            arc::print_prompt();
-
-            // IO error!
-            if (!std::getline(std::cin, input))
-                return -1;
-
-            lex::tokenize(input);
-
-            if (input.empty())
-                continue;
-
-            else if (strings::any(input, {"exit", "quit", ";"}, true))
-                return 0;
-
-            else if (strings::any(input, {"cls", "clear"}, true))
-            {
-                arc::clear_console();
-                continue;
-            }
-
-            else if (strings::any(input, {"cd", "chdir", ">>"}, true))
-                foldersystem::change("scripts");
-
-            std::cout << std::endl;
-        }
-
-        return 0;
     }
 }
