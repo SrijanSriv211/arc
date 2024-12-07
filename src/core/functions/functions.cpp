@@ -107,7 +107,7 @@ namespace functions
         // main commands
         {{"cls", "clear",}, {arc::clear_console, true}},
         {{"cd..", "prevdir", "<<"}, {prevdir, false}},
-        {{"cd.", "getdir", ".."}, {getdir, false}},
+        {{"cd.", "getdir", ".."}, {getdir, true}},
         {{"init", "-i"}, {init_folders, true}},
 
         // easter egg commands
