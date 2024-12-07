@@ -1,6 +1,7 @@
 #include "arcpch.h"
 #include "arc.h"
 
+#include "functions/functions.h"
 #include "fileio/foldersystem.h"
 #include "fileio/filesystem.h"
 #include "settings/settings.h"
@@ -30,34 +31,20 @@ namespace arc
             if (strings::any(cmd, {"exit", "quit", ";"}, true))
                 return 0;
 
-            else if (strings::any(cmd, {"cls", "clear"}, true))
+            else if (functions::get_cmd_func(cmd).first != nullptr)
             {
-                arc::clear_console();
-                continue;
+                std::pair<std::function<void()>, bool> func_map = functions::get_cmd_func(cmd);
+                (func_map.first)();
+                if (func_map.second == true)
+                    continue;
             }
 
-            else if (strings::any(cmd, {"cd.", "getdir", ".."}, true))
-                console::print("\n" + std::filesystem::current_path().string(), console::color::LIGHT_WHITE);
-
-            else if (strings::any(cmd, {"cd..", "cmbk", "<<"}, true))
-                foldersystem::change("..");
-
-            else if (strings::any(cmd, {"cd", "chdir", ">>"}, true))
+            else if (functions::get_cmd_args_func(cmd).first != nullptr)
             {
-                if (args.empty())
-                    console::errors::runtime(cmd, "No folder path found");
-
-                foldersystem::change(args.front());
-            }
-
-            else if (strings::any(cmd, {"init", "-i"}, true))
-            {
-                // initialize .arc folder with it's subdirectories
-                // this folder will contain all the settings for arc
-                foldersystem::create(".arc");
-                foldersystem::create(".arc\\etc");
-                filesystem::write(".arc\\settings.json", settings::format);
-                continue;
+                std::pair<std::function<void(const std::vector<std::string>&)>, bool> func_map = functions::get_cmd_args_func(cmd);
+                (func_map.first)(args);
+                if (func_map.second == true)
+                    continue;
             }
 
             else if (settings::get_command_by_name(cmd) != -1)
