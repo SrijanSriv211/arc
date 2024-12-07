@@ -18,7 +18,7 @@ CONFIG = {
     "INCLUDES": ["src/", "src/core/", "src/shared/", "src/vendor/"],
     "EXTRAS": "-lws2_32",
     "STD": "c++20",
-    "OUTPATH": "bin2\\arc.exe",
+    "OUTPATH": "bin\\arc.exe",
     "OPTIMIZATION": "-O2",
     "PRECOMPILES": [
         ("src/arcpch.h.gch", "g++ src/arcpch.h"), # compile arc precompiled headers
