@@ -64,6 +64,7 @@ namespace settings
         if (arg_idx >= static_cast<int>(command["paths"].size()) || arg_idx < -1)
         {
             console::errors::runtime("argid = " + command["argid"].dump(), "Invalid setting for `argid` at command index " + std::to_string(id));
+            std::cout << std::endl;
             return;
         }
 

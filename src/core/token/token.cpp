@@ -55,6 +55,7 @@ namespace lex
 				{
                     std::string error_detail = "unexpected end of tokens after " + std::string(1, str_literal);
                     console::errors::syntax(error_detail);
+					std::cout << std::endl;
 					return tokens;
 				}
 				i--;
@@ -94,6 +95,7 @@ namespace lex
 				{
 					std::string error_detail = "missing terminating " + std::string(1, str_literal) + " character";
                     console::errors::syntax(error_detail);
+					std::cout << std::endl;
 					return tokens;
 				}
 
