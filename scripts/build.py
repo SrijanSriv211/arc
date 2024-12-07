@@ -1,4 +1,4 @@
-import shutil, sys, os
+import sys, os
 
 # https://stackoverflow.com/a/18351977/18121288
 # Though not widely known, str.endswith also accepts a tuple. You don't need to loop.
@@ -27,17 +27,13 @@ CONFIG = {
 }
 COMMON = f"{join(CONFIG["INCLUDES"], "-I")} {CONFIG["EXTRAS"]} {CONFIG["OPTIMIZATION"]} -std={CONFIG["STD"]} -Wall"
 
+if not os.path.isdir(os.path.dirname(CONFIG["OUTPATH"])):
+    os.mkdir(os.path.dirname(CONFIG["OUTPATH"]))
+
 if len(sys.argv) <= 1:
     [system(cmd) for path, cmd in CONFIG["PRECOMPILES"] if not os.path.isfile(path)]
 
     obj_files = get_files(CONFIG["SRC_PATH"], (".cpp", ".c"))
-
-    if os.path.isdir(os.path.dirname(CONFIG["OUTPATH"])):
-        shutil.rmtree(f"{os.path.dirname(CONFIG["OUTPATH"])}/")
-
-    if not os.path.isdir(os.path.dirname(CONFIG["OUTPATH"])):
-        os.mkdir(os.path.dirname(CONFIG["OUTPATH"]))
-
     system(f"g++ {CONFIG["ICON_PATH"]} {join(obj_files)} {COMMON} -o {CONFIG["OUTPATH"]}")
 
 os.system(f"call {CONFIG["OUTPATH"]}")
