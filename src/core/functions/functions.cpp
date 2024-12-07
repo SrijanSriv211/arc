@@ -97,6 +97,11 @@ namespace functions
         std::filesystem::current_path(path.front());
     }
 
+    void cmd(const std::vector<std::string>& args)
+    {
+        std::system(strings::trim(strings::join("", args)).c_str());
+    }
+
     // { [...] : [...(), true/false] }; if true then "continue" the loop else don't
     std::map<std::vector<std::string>, std::pair<std::function<void()>, bool>> cmd_func_map = {
         // main commands
@@ -119,6 +124,7 @@ namespace functions
     // { [...] : [...(...), true/false] }
     std::map<std::vector<std::string>, std::pair<std::function<void(const std::vector<std::string>&)>, bool>> cmd_args_func_map = {
         {{"cd", "chdir", ">>"}, {chdir, false}},
+        {{"start", "call", ">"}, {cmd, false}},
     };
 
     std::pair<std::function<void()>, bool> get_cmd_func(const std::string& cmd)
