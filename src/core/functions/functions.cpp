@@ -64,7 +64,7 @@ namespace functions
             "REGISTERED OWNER : " + std::string(std::getenv("username")),
             "",
             "ROOT DIRECTORY     : " + arc::get_root_path(),
-            "SETTINGS FILE      : " + arc::arc_env_path + "\\.ao\\settings.json",
+            "SETTINGS FILE      : " + arc::arc_env_path + "\\.arc\\settings.json",
             "",
             "GITHUB REPO     : https://github.com/SrijanSriv211/arc",
             "SYSTEM LANGUAGE : en-in; English (India)"
@@ -111,6 +111,7 @@ namespace functions
         {{"init", "-i"}, {init_folders, true}},
 
         // easter egg commands
+        {{"_diagxt"}, {diagxt, false}},
         {{"_AOs1000"}, {AOs1000, false}},
         {{"_BadApple"}, {BadApple, true}},
         {{"_R*6"}, {Rockstar6, true}},
