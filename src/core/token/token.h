@@ -11,9 +11,11 @@ namespace lex
 		WHITESPACE, 		// 3
 		SEMICOLON, 			// 4
 		STRING, 			// 5
-		FLAG, 				// 5+1
-		MATH, 				// 7
-		ID, 				// 8
+		ANGLE, 				// 5+1
+		FLAG, 				// 7
+		MATH, 				// 8
+		DOT, 				// 9
+		ID	 				// 10
 	};
 
 	struct token

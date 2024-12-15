@@ -43,7 +43,41 @@ namespace lex
 
 			else if (tok == ";")
 			{
+				i++;
+				while(i < line.size() && line[i] == ';')
+				{
+					tok += line[i];
+					i++;
+				}
+				i--;
+
 				tokens.push_back({tok, lex::token_type::SEMICOLON});
+			}
+
+			else if (tok == "<" || tok == ">")
+			{
+				i++;
+				while(i < line.size() && strings::any(std::string(1, line[i]), {"<", ">"}, true))
+				{
+					tok += line[i];
+					i++;
+				}
+				i--;
+
+				tokens.push_back({tok, lex::token_type::ANGLE});
+			}
+
+			else if (tok == ".")
+			{
+				i++;
+				while(i < line.size() && line[i] == '.')
+				{
+					tok += line[i];
+					i++;
+				}
+				i--;
+
+				tokens.push_back({tok, lex::token_type::DOT});
 			}
 
 			else if (strings::any(tok, {"\"", "'", "`"}, true))
