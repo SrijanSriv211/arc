@@ -4,11 +4,12 @@
 #include "fileio/filesystem.h"
 #include "datetime/datetime.h"
 #include "console/console.h"
+#include "settings/settings.h"
 
 namespace arc
 {
     std::string current_path;
-    std::string arc_env_path = std::filesystem::current_path().string();
+    std::string env_path = std::filesystem::current_path().string();
 
     // https://stackoverflow.com/q/50889647/18121288
     std::string get_root_path()
@@ -37,8 +38,7 @@ namespace arc
             console::print("Please use AO in Windows Terminal for better experience.", console::color::RED);
         }
 
-        current_path = std::filesystem::current_path().string();
-        console::print(std::filesystem::current_path().string(), console::color::LIGHT_WHITE);
+        current_path = "";
     }
 
     void print_prompt()
@@ -49,6 +49,7 @@ namespace arc
             console::print(std::filesystem::current_path().string(), console::color::LIGHT_WHITE);
         }
 
-        console::print(">~ ", console::color::GRAY, false);
+        console::print(settings::load()["envname"], console::color::LIGHT_RED, false);
+        console::print("~> ", console::color::GRAY, false);
     }
 }
