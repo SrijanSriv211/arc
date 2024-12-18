@@ -12,18 +12,23 @@ using json = nlohmann::json;
 
 namespace settings
 {
-    std::string format = R"([
-    {
-        "names": [],
-        "paths": [],
-        "argid": -1
-    }
-]
+    std::string format = R"({
+    "envname": "root",
+    "startlist": [],
+    "cmd": [
+        {
+            "names": [],
+            "paths": [],
+            "id": -1,
+            "noline": false
+        }
+    ]
+}
 )";
 
     json load()
     {
-        std::string env_path = arc::arc_env_path + "\\.arc\\settings.json";
+        std::string env_path = arc::env_path + "\\.arc\\settings.json";
         if (!std::filesystem::exists(env_path))
         {
             env_path = arc::get_root_path() + "\\settings.json";
@@ -40,7 +45,7 @@ namespace settings
 
     int get_command_by_name(const std::string& cmd)
     {
-        json commands = load();
+        json commands = load()["cmd"];
 
         for (size_t i = 0; i < commands.size(); i++)
         {
@@ -54,18 +59,18 @@ namespace settings
         return -1;
     }
 
-    void run_command_by_id(const std::string& cmd, const std::vector<std::string>& args)
+    bool run_command_by_id(const std::string& cmd, const std::vector<std::string>& args)
     {
         int id = get_command_by_name(cmd);
-        json command = load()[id];
+        json command = load()["cmd"][id];
 
-        int arg_idx = std::stoi(command["argid"].dump());
+        int arg_idx = std::stoi(command["id"].dump());
 
         if (arg_idx >= static_cast<int>(command["paths"].size()) || arg_idx < -1)
         {
-            console::errors::runtime("argid = " + command["argid"].dump(), "Invalid setting for `argid` at command index " + std::to_string(id));
+            console::errors::runtime("id = " + command["id"].dump(), "Invalid setting for `id` at command index " + std::to_string(id));
             std::cout << std::endl;
-            return;
+            return false;
         }
 
         std::vector<std::string> paths = command["paths"];
@@ -77,5 +82,6 @@ namespace settings
         }
 
         std::system(strings::join(" && ", paths).c_str());
+        return command["noline"];
     }
 }
