@@ -7,6 +7,7 @@
 #include "settings/settings.h"
 #include "strings/strings.h"
 #include "console/console.h"
+#include "array/array.h"
 
 namespace functions
 {
@@ -64,7 +65,7 @@ namespace functions
             "REGISTERED OWNER : " + std::string(std::getenv("username")),
             "",
             "ROOT DIRECTORY     : " + arc::get_root_path(),
-            "SETTINGS FILE      : " + arc::arc_env_path + "\\.arc\\settings.json",
+            "SETTINGS FILE      : " + arc::env_path + "\\.arc\\settings.json",
             "",
             "GITHUB REPO     : https://github.com/SrijanSriv211/arc",
             "SYSTEM LANGUAGE : en-in; English (India)"
@@ -97,9 +98,18 @@ namespace functions
         std::filesystem::current_path(strings::trim(strings::join(" ", path)));
     }
 
-    void chenv()
+    void chenv(const std::vector<std::string>& path)
     {
-        arc::arc_env_path = std::filesystem::current_path().string();
+        std::string env_path = std::filesystem::current_path().string();
+        if (!array::is_empty(path))
+        {
+            std::string orig_path = std::filesystem::current_path().string();
+            chdir(path);
+            env_path = std::filesystem::current_path().string();
+            chdir({orig_path});
+        }
+
+        arc::env_path = env_path;
     }
 
     void cmd(const std::vector<std::string>& args)
@@ -114,7 +124,6 @@ namespace functions
         {{"cd..", "prevdir", "<<"}, {prevdir, false}},
         {{"cd.", "getdir", ".."}, {getdir, true}},
         {{"init", "-i"}, {init_folders, true}},
-        {{"env", "chenv", "..."}, {chenv, false}},
 
         // easter egg commands
         {{"_diagxt"}, {diagxt, false}},
@@ -130,6 +139,7 @@ namespace functions
 
     // { [...] : [...(...), true/false] }
     std::map<std::vector<std::string>, std::pair<std::function<void(const std::vector<std::string>&)>, bool>> cmd_args_func_map = {
+        {{"env", "chenv", "..."}, {chenv, true}},
         {{"cd", "chdir", ">>"}, {chdir, false}},
         {{"start", "call", ">"}, {cmd, false}},
     };
