@@ -72,6 +72,20 @@ namespace console
         SetConsoleCursorPosition(h, c);
     }
 
+    // calculate exact (x, y) pos from a distance.
+    void set_cursor_pos(const int& total_dist)
+    {
+        COORD pos = get_cursor_pos(total_dist);
+
+        if (pos.Y >= console::get_console_window_height() - 1 && pos.X >= console::get_console_window_width() - 1)
+        {
+            pos.Y--;
+            std::cout << std::endl;
+        }
+
+        console::set_cursor_pos({pos.X, pos.Y});
+    }
+
     // https://stackoverflow.com/a/35800317/18121288
     COORD get_cursor_pos()
     {
@@ -81,6 +95,15 @@ namespace console
         if (GetConsoleScreenBufferInfo(h, &cbsi))
             return cbsi.dwCursorPosition;
         return {0, 0}; // else return this
+    }
+
+    // calculate the exact x and y positions to put the cursor at.
+    COORD get_cursor_pos(const int& total_dist)
+    {
+        short y = total_dist / console::get_console_window_width();
+        short x = total_dist - (y * console::get_console_window_width());
+
+        return {x, y};
     }
 
     // https://stackoverflow.com/a/41213165/18121288

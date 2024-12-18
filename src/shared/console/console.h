@@ -33,8 +33,10 @@ namespace console
     int get_console_window_width();
     int get_console_window_height();
 
-    COORD get_cursor_pos();
     void set_cursor_pos(const COORD& c);
+    void set_cursor_pos(const int& total_dist);
+    COORD get_cursor_pos();
+    COORD get_cursor_pos(const int& total_dist);
 
     bool getconchar(KEY_EVENT_RECORD& krec);
     DWORD get_modifier_state(KEY_EVENT_RECORD& krec);
