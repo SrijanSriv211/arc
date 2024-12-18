@@ -94,12 +94,17 @@ namespace functions
 
     void chdir(const std::vector<std::string>& path)
     {
-        std::filesystem::current_path(path.front());
+        std::filesystem::current_path(strings::trim(strings::join(" ", path)));
+    }
+
+    void chenv()
+    {
+        arc::arc_env_path = std::filesystem::current_path().string();
     }
 
     void cmd(const std::vector<std::string>& args)
     {
-        std::system(strings::trim(strings::join("", args)).c_str());
+        std::system(strings::trim(strings::join(" ", args)).c_str());
     }
 
     // { [...] : [...(), true/false] }; if true then "continue" the loop else don't
@@ -109,6 +114,7 @@ namespace functions
         {{"cd..", "prevdir", "<<"}, {prevdir, false}},
         {{"cd.", "getdir", ".."}, {getdir, true}},
         {{"init", "-i"}, {init_folders, true}},
+        {{"env", "chenv", "..."}, {chenv, false}},
 
         // easter egg commands
         {{"_diagxt"}, {diagxt, false}},

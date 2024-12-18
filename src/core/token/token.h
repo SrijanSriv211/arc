@@ -1,6 +1,5 @@
 #pragma once
 
-
 namespace lex
 {
 	enum token_type
