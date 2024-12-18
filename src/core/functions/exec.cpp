@@ -48,7 +48,10 @@ namespace arc
             }
 
             else if (settings::get_command_by_name(cmd) != -1)
-                settings::run_command_by_id(cmd, args);
+            {
+                if (settings::run_command_by_id(cmd, args))
+                    continue;
+            }
 
             else
                 console::errors::runtime(cmd, "Command not found");
@@ -57,5 +60,20 @@ namespace arc
         }
 
         return 0;
+    }
+
+    void run_startlist()
+    {
+        std::vector<std::string> startlist = settings::load()["startlist"];
+        if (array::is_empty(startlist))
+            return;
+
+        for (const std::string& filename : startlist)
+        {
+            console::print("> ", console::color::GRAY, false);
+            console::print(filename, console::color::LIGHT_WHITE);
+            std::system(filename.c_str());
+            std::cout << std::endl;
+        }
     }
 }
