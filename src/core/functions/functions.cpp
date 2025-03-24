@@ -119,13 +119,13 @@ namespace functions
     // { [...] : [...(), true/false] }; if true then "continue" the loop else don't
     std::map<std::vector<std::string>, std::pair<std::function<void()>, bool>> cmd_func_map = {
         // main commands
+        {{"diagxt"}, {diagxt, false}},
         {{"cls", "clear",}, {arc::clear_console, true}},
         {{"cd..", "prevdir", "<<"}, {prevdir, false}},
         {{"cd.", "getdir", ".."}, {getdir, true}},
         {{"init", "-i", ":"}, {init_folders, true}},
 
         // easter egg commands
-        {{"_diagxt"}, {diagxt, false}},
         {{"_AOs1000"}, {AOs1000, false}},
         {{"_BadApple"}, {BadApple, true}},
         {{"_R*6"}, {Rockstar6, true}},
