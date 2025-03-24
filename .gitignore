@@ -1,4 +1,5 @@
 .vscode/
+.arc/
 /bin/
 src/arcpch.h.gch
 src/ico.o
