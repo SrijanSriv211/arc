@@ -27,8 +27,8 @@ namespace console
     void set_console_color(const color& fore);
     void set_console_color(const color& fore, const color& back);
 
-    void print(const std::string& message, const console::color& fore, const bool& endl=true);
-    void print(const std::string& message, const console::color& fore, const console::color& back, const bool& endl=true);
+    void print(const std::string& message, const console::color& fore, const bool& endl=true, const bool& flush=false);
+    void print(const std::string& message, const console::color& fore, const console::color& back, const bool& endl=true, const bool& flush=false);
 
     int get_console_window_width();
     int get_console_window_height();
