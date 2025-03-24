@@ -39,7 +39,7 @@ if len(sys.argv) <= 1:
     obj_files = get_files(CONFIG["SRC_PATH"], (".cpp", ".c"))
     system(f"g++ {CONFIG["ICON_PATH"]} {join(obj_files)} {COMMON} -o {CONFIG["OUTPATH"] + CONFIG["OUTNAME"]}")
 
-    dll_files = get_files(CONFIG["DLLPATH"], (".dll"))
+    dll_files = get_files(CONFIG["DLLPATH"], (".dll", ".pem"))
     [shutil.copy2(file, CONFIG["OUTPATH"]) for file in dll_files]
 
 os.system(f"call {CONFIG["OUTPATH"] + CONFIG["OUTNAME"]}")
