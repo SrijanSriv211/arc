@@ -36,20 +36,26 @@ namespace arc
             {
                 const json model_access = settings::load()["model_access"];
                 std::map<std::string, std::string> help_map = {
-                    {"envname:", settings::load()["envname"].get<std::string>() + "\n\n"},
-                    {"model_access:", model_access[0].get<std::string>() + "\t(" + model_access[1].get<std::string>() + ")\n\n"},
-                    {"startlist:", strings::join(", ", settings::load()["startlist"]) + "\n\n"},
-                    {"int. cmds:", strings::join("\n", functions::get_all_cmds()) + "\n\n"},
-                    {"ext. cmds:", strings::join("\n", settings::get_all_cmds()) + "\n"}
+                    {"envname:", settings::load()["envname"].get<std::string>()},
+                    {"model_access:", model_access[0].get<std::string>()},
+                    {"startlist:", strings::join(", ", settings::load()["startlist"])},
+                    {"int. cmds:", strings::join("\n", functions::get_all_cmds())},
+                    {"ext. cmds:", strings::join("\n", settings::get_all_cmds())}
                 };
 
+                bool is_first_item = true;
+                std::vector<std::string> helps = {};
                 for (const auto& [key, pair] : help_map)
                 {
                     if (strings::is_empty(pair))
                         continue;
 
+                    if (!is_first_item)
+                        std::cout << std::endl;
+
                     console::print(key, console::LIGHT_WHITE);
-                    std::cout << pair;
+                    std::cout << pair << std::endl;
+                    is_first_item = false;
                 }
             }
 
@@ -86,8 +92,8 @@ namespace arc
                     continue;
                 }
 
-                console::print("Command not found. Using to ", console::GRAY, false);
-                console::print("`" + MODEL + "`", console::LIGHT_WHITE);
+                console::print("Command not found. Using to ", console::LIGHT_WHITE, false);
+                console::print("`" + MODEL + "`", console::GRAY);
                 llm::generate(strings::join("", tokens), MODEL, API_KEY);
             }
 
