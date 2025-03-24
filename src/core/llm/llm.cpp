@@ -55,7 +55,7 @@ namespace llm
 
             catch (json::parse_error& e)
             {
-                std::cerr << "JSON Parse Error: " << e.what() << std::endl;
+                // std::cerr << "JSON Parse Error: " << e.what() << std::endl;
             }
         }
 
@@ -116,5 +116,6 @@ namespace llm
         curl_slist_free_all(headers);
         curl_easy_cleanup(curl);
         curl_global_cleanup();
+        std::cout << std::endl;
     }
 }
