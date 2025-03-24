@@ -77,16 +77,18 @@ namespace arc
 
             else
             {
-                console::errors::runtime(cmd, "Command not found");
-
                 std::string MODEL = settings::load()["model_access"][0];
                 std::string API_KEY = settings::load()["model_access"][1];
 
                 if (strings::is_empty(API_KEY) || API_KEY == "groq-api-key" || API_KEY == "api-key" || API_KEY == "GROQ-API-KEY" || API_KEY == "API-KEY")
+                {
+                    console::errors::runtime(cmd, "Command not found");
                     continue;
+                }
 
-                console::print("Using `" + MODEL + "`", console::GRAY);
-                llm::generate(strings::join(" ", tokens), MODEL, API_KEY);
+                console::print("Command not found. Using to ", console::GRAY, false);
+                console::print("`" + MODEL + "`", console::LIGHT_WHITE);
+                llm::generate(strings::join("", tokens), MODEL, API_KEY);
             }
 
             std::cout << std::endl;
