@@ -9,6 +9,7 @@
 #include "console/console.h"
 #include "stylus/stylus.h"
 #include "array/array.h"
+#include "llm/llm.h"
 
 namespace arc
 {
@@ -30,6 +31,26 @@ namespace arc
 
             if (strings::any(cmd, {"exit", "quit", ";"}, true))
                 return 0;
+
+            else if (strings::any(cmd, {"help", "/?"}, true))
+            {
+                std::map<std::string, std::string> help_map = {
+                    {"envname: ", settings::load()["envname"].get<std::string>() + "\n"},
+                    {"model_access: ", settings::load()["model_access"][0].get<std::string>() + "\n"},
+                    {"startlist:\n", strings::join(", ", settings::load()["startlist"]) + "\n"},
+                    {"int. cmds:\n", strings::join("\n", functions::get_all_cmds()) + "\n"},
+                    {"ext. cmds:\n", strings::join("\n", settings::get_all_cmds())}
+                };
+
+                for (const auto& [key, pair] : help_map)
+                {
+                    if (strings::is_empty(pair))
+                        continue;
+
+                    console::print(key, console::LIGHT_WHITE);
+                    std::cout << pair << std::endl;
+                }
+            }
 
             else if (functions::get_cmd_func(cmd).first != nullptr)
             {
@@ -54,7 +75,18 @@ namespace arc
             }
 
             else
+            {
                 console::errors::runtime(cmd, "Command not found");
+
+                std::string MODEL = settings::load()["model_access"][0];
+                std::string API_KEY = settings::load()["model_access"][1];
+
+                if (strings::is_empty(API_KEY) || API_KEY == "groq-api-key" || API_KEY == "api-key" || API_KEY == "GROQ-API-KEY" || API_KEY == "API-KEY")
+                    continue;
+
+                console::print("Using `" + MODEL + "`", console::GRAY);
+                llm::generate(strings::join(" ", tokens), MODEL, API_KEY);
+            }
 
             std::cout << std::endl;
         }

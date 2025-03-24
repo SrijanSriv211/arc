@@ -2,11 +2,10 @@
 #include "settings.h"
 #include "arc.h"
 
+#include "nlohmann/json.hpp"
 #include "strings/strings.h"
 #include "console/console.h"
 #include "array/array.h"
-
-#include "nlohmann/json.hpp"
 
 using json = nlohmann::json;
 
@@ -14,6 +13,7 @@ namespace settings
 {
     std::string format = R"({
     "envname": "root",
+    "model_access": ["llama-3.3-70b-versatile", "groq-api-key"],
     "startlist": [],
     "cmd": [
         {
@@ -41,6 +41,23 @@ namespace settings
 
         std::ifstream f(env_path);
         return json::parse(f);
+    }
+
+    std::vector<std::string> get_all_cmds()
+    {
+        std::vector<std::string> all_cmds = {};
+        json commands = load()["cmd"];
+
+        for (size_t i = 0; i < commands.size(); i++)
+        {
+            if (array::is_empty(array::trim(commands[i]["names"])))
+                continue;
+
+            std::string names = strings::join(", ", array::trim(commands[i]["names"]));
+            all_cmds.push_back(names);
+        }
+
+        return all_cmds;
     }
 
     int get_command_by_name(const std::string& cmd)

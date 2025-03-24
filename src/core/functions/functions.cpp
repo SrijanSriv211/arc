@@ -79,7 +79,6 @@ namespace functions
     void init_folders()
     {
         foldersystem::create(".arc");
-        foldersystem::create(".arc\\etc");
         filesystem::write(".arc\\settings.json", settings::format);
     }
 
@@ -123,7 +122,7 @@ namespace functions
         {{"cls", "clear",}, {arc::clear_console, true}},
         {{"cd..", "prevdir", "<<"}, {prevdir, false}},
         {{"cd.", "getdir", ".."}, {getdir, true}},
-        {{"init", "-i"}, {init_folders, true}},
+        {{"init", "-i", ":"}, {init_folders, true}},
 
         // easter egg commands
         {{"_diagxt"}, {diagxt, false}},
@@ -164,5 +163,18 @@ namespace functions
         }
 
         return {nullptr, true};
+    }
+
+    std::vector<std::string> get_all_cmds()
+    {
+        std::vector<std::string> all_cmds = {};
+
+        for (const auto& [key, pair] : cmd_func_map)
+            all_cmds.push_back(strings::join(", ", key));
+
+        for (const auto& [key, pair] : cmd_args_func_map)
+            all_cmds.push_back(strings::join(", ", key));
+
+        return all_cmds;
     }
 }
