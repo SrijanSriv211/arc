@@ -34,12 +34,13 @@ namespace arc
 
             else if (strings::any(cmd, {"help", "/?"}, true))
             {
+                const json model_access = settings::load()["model_access"];
                 std::map<std::string, std::string> help_map = {
-                    {"envname: ", settings::load()["envname"].get<std::string>() + "\n"},
-                    {"model_access: ", settings::load()["model_access"][0].get<std::string>() + "\n"},
-                    {"startlist:\n", strings::join(", ", settings::load()["startlist"]) + "\n"},
-                    {"int. cmds:\n", strings::join("\n", functions::get_all_cmds()) + "\n"},
-                    {"ext. cmds:\n", strings::join("\n", settings::get_all_cmds())}
+                    {"envname:", settings::load()["envname"].get<std::string>() + "\n\n"},
+                    {"model_access:", model_access[0].get<std::string>() + "\t(" + model_access[1].get<std::string>() + ")\n\n"},
+                    {"startlist:", strings::join(", ", settings::load()["startlist"]) + "\n\n"},
+                    {"int. cmds:", strings::join("\n", functions::get_all_cmds()) + "\n\n"},
+                    {"ext. cmds:", strings::join("\n", settings::get_all_cmds()) + "\n"}
                 };
 
                 for (const auto& [key, pair] : help_map)
@@ -48,7 +49,7 @@ namespace arc
                         continue;
 
                     console::print(key, console::LIGHT_WHITE);
-                    std::cout << pair << std::endl;
+                    std::cout << pair;
                 }
             }
 
