@@ -15,11 +15,10 @@ namespace arc
 {
     int is_running()
     {
+        console::stylus s = console::stylus();
         while(true)
         {
             arc::print_prompt();
-
-            console::stylus s = console::stylus();
             std::vector<std::string> tokens = s.read();
 
             if (array::is_empty(tokens))
@@ -88,7 +87,7 @@ namespace arc
 
                 if (strings::is_empty(API_KEY) || API_KEY == "groq-api-key" || API_KEY == "api-key" || API_KEY == "GROQ-API-KEY" || API_KEY == "API-KEY")
                 {
-                    console::errors::runtime(cmd, "Command not found");
+                    console::errors::runtime(cmd, "Command not found\n");
                     continue;
                 }
 
