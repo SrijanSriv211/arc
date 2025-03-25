@@ -13,14 +13,16 @@ namespace console
 
 	public:
 		std::string input;
+		std::vector<std::string> history;
 
 	private:
-		void delete_last_word(std::string& input);
 		console::color get_token_color(const lex::token_type& type);
-		void render_char(const lex::token& token, const console::color &fore);
+		void render_token(const lex::token& token, const console::color &fore, const bool& render_char=true);
+		COORD get_current_cursor_pos(const COORD& orig_cursor_pos);
 
 	private:
-		std::vector<std::vector<std::string>> history;
+		std::vector<std::string>::size_type h_idx; // history index
 		std::string r_input; // rendered input
+		size_t idx; // cursor pos index (in terms of length of input)
 	};
 }
