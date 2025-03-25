@@ -132,6 +132,7 @@ if len(sys.argv) <= 1:
 
         elif filename.endswith(".c"):
             os.system(f"gcc -c {filename} {COMMON} -o {objname}")
+    print() if files_to_compile else None
 
     # precompile files
     [system(cmd) for path, cmd in CONFIG["PRECOMPILES"] if not os.path.isfile(path)]
