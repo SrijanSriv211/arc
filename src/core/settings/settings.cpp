@@ -13,7 +13,7 @@ namespace settings
 {
     std::string format = R"({
     "envname": "root",
-    "model_access": ["llama-3.3-70b-versatile", "groq-api-key"],
+    "model_access": ["deepseek-r1-distill-llama-70b", "groq-api-key"],
     "startlist": [],
     "cmd": [
         {
