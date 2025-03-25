@@ -22,7 +22,7 @@ namespace arc
             console::stylus s = console::stylus();
             std::vector<std::string> tokens = s.read();
 
-            if (tokens.empty())
+            if (array::is_empty(tokens))
                 continue;
 
             // break tokens into `cmd` and `args`
@@ -92,8 +92,6 @@ namespace arc
                     continue;
                 }
 
-                console::print("Command not found. Using to ", console::LIGHT_WHITE, false);
-                console::print("`" + MODEL + "`", console::GRAY);
                 llm::generate(strings::join("", tokens), MODEL, API_KEY);
             }
 
