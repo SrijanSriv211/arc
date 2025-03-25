@@ -96,7 +96,7 @@ namespace lex
 
 				// make string
 				i++;
-				while(i < line.size() && line[i] != str_literal)
+				while(i < line.size())
 				{
 					if (line[i] == '\\')
 					{
@@ -118,12 +118,17 @@ namespace lex
 						}
 					}
 
+					else if (line[i] == str_literal)
+					{
+						tok += line[i];
+						break;
+					}
+
 					else
 						tok += line[i];
 
 					i++;
 				}
-				tok += line[i];
 
 				if (throw_error && i >= line.size())
 				{
