@@ -23,5 +23,5 @@ namespace lex
 		token_type type;
 	};
 
-	std::vector<token> tokenize(const std::string& line);
+	std::vector<token> tokenize(const std::string& line, const bool& throw_error=true);
 }

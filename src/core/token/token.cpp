@@ -6,7 +6,7 @@
 
 namespace lex
 {
-	std::vector<token> tokenize(const std::string& line)
+	std::vector<token> tokenize(const std::string& line, const bool& throw_error)
 	{
 		std::vector<token> tokens;
 		std::string tok;
@@ -85,7 +85,7 @@ namespace lex
 				char str_literal = tok.front();
 
 				i++;
-				if (i >= line.size())
+				if (throw_error && i >= line.size())
 				{
                     std::string error_detail = "unexpected end of tokens after " + std::string(1, str_literal);
                     console::errors::syntax(error_detail);
@@ -125,7 +125,7 @@ namespace lex
 				}
 				tok += line[i];
 
-				if (i >= line.size())
+				if (throw_error && i >= line.size())
 				{
 					std::string error_detail = "missing terminating " + std::string(1, str_literal) + " character";
                     console::errors::syntax(error_detail);
