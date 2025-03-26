@@ -42,7 +42,7 @@ namespace console
 			}
 
             // backspace
-            if (virtual_key_code == VK_BACK)
+            else if (virtual_key_code == VK_BACK)
             {
 				COORD cursor_pos = console::get_cursor_pos();
 				if (!this->input.empty() && this->idx > 0 && cursor_pos.X >= orig_cursor_pos.X && cursor_pos.Y >= orig_cursor_pos.Y)
@@ -70,10 +70,9 @@ namespace console
 					std::cout << std::string(this->input.size() - this->idx + chunk_len, ' ');
 					console::set_cursor_pos(current_cursor_pos);
 				}
-                continue;
             }
 
-			if (virtual_key_code == VK_LEFT)
+			else if (virtual_key_code == VK_LEFT)
 			{
 				if (this->idx > 0)
 				{
@@ -97,10 +96,9 @@ namespace console
 					COORD current_cursor_pos = this->get_current_cursor_pos(orig_cursor_pos);
 					console::set_cursor_pos(current_cursor_pos);
 				}
-				continue;
 			}
 
-			if (virtual_key_code == VK_RIGHT)
+			else if (virtual_key_code == VK_RIGHT)
 			{
 				if (this->idx < this->input.size())
 				{
@@ -123,10 +121,9 @@ namespace console
 					COORD current_cursor_pos = this->get_current_cursor_pos(orig_cursor_pos);
 					console::set_cursor_pos(current_cursor_pos);
 				}
-				continue;
 			}
 
-			if (virtual_key_code == VK_UP && !array::is_empty(this->history))
+			else if (virtual_key_code == VK_UP && !array::is_empty(this->history))
 			{
 				if (this->h_idx > 0)
 					this->h_idx--;
@@ -148,7 +145,7 @@ namespace console
 				moved_in_history = true;
 			}
 
-			if (virtual_key_code == VK_DOWN && !array::is_empty(this->history))
+			else if (virtual_key_code == VK_DOWN && !array::is_empty(this->history))
 			{
 				if (this->h_idx < this->history.size() - 1)
 					this->h_idx++;
@@ -171,41 +168,54 @@ namespace console
 			}
 
             // regular character input
-            if (key_event.uChar.AsciiChar && isprint(key_event.uChar.AsciiChar))
+            else if (key_event.uChar.AsciiChar && isprint(key_event.uChar.AsciiChar))
 			{
+				COORD current_cursor_pos = this->get_current_cursor_pos(orig_cursor_pos);
+				console::set_cursor_pos(current_cursor_pos);
+				std::cout << std::string(this->input.size() - this->idx, ' ');
+				console::set_cursor_pos(current_cursor_pos);
+
 				this->input.insert(this->idx, 1, key_event.uChar.AsciiChar);
 				this->idx++;
 			}
+
+			else
+				continue;
 
 			// render if input is changed
 			if (this->input == this->r_input)
 				continue;
 
 			// tokenize input
+			this->r_input = this->input;
 			tokens = lex::tokenize(this->input, false);
 
-			if (moved_in_history)
+			COORD current_cursor_pos = this->get_current_cursor_pos(orig_cursor_pos);
+			console::set_cursor_pos(current_cursor_pos);
+			if (this->idx == this->input.size())
 			{
-				for (std::vector<lex::token>::size_type i = 0; i < tokens.size(); i++)
+				console::color color = tokens.size() == 1 ? console::LIGHT_WHITE : this->get_token_color(tokens.back().type);
+				console::print(std::string(1, tokens.back().name.back()), color, false, true);
+			}
+
+			else
+			{
+				stylus::RTP_COORD coord = this->calc_render_token_pos_coord(tokens, moved_in_history ? 0 : this->idx);
+
+				// render the input
+				for (std::vector<lex::token>::size_type i = coord.t; i < tokens.size(); i++)
 				{
-					if (i == 0)
-					{
-						this->render_token(tokens[i], console::LIGHT_WHITE, false);
-						continue;
-					}
-					this->render_token(tokens[i], this->get_token_color(tokens[i].type), false);
+					std::string tok_name = tokens[i].name;
+
+					if (i == coord.t)
+						tok_name = tok_name.substr(coord.c);
+
+					console::color color = i == 0 ? console::LIGHT_WHITE : this->get_token_color(tokens[i].type);
+					console::print(tok_name, color, false, true);
 				}
-
-				moved_in_history = false;
-				continue;
 			}
-
-			if (tokens.size() == 1)
-			{
-				this->render_token(tokens.back(), console::LIGHT_WHITE);
-				continue;
-			}
-			this->render_token(tokens.back(), this->get_token_color(tokens.back().type));
+			moved_in_history = false;
+			console::set_cursor_pos(current_cursor_pos);
 		}
 
 		tokens = lex::tokenize(this->input);
@@ -223,7 +233,8 @@ namespace console
 			this->h_idx = this->history.size() - 1;
 		}
 		std::cout << "[" << this->input << "]\n";
-		return tokens_s;
+		return {};
+		// return tokens_s;
 	}
 
     // Color mapping for different token types
@@ -244,13 +255,6 @@ namespace console
         }
     }
 
-	void stylus::render_token(const lex::token& token, const console::color &fore, const bool& render_char)
-	{
-		std::string token_name = render_char ? std::string(1, token.name.back()) : token.name;
-		console::print(token_name, fore, false, true);
-		this->r_input = this->input;
-	}
-
 	COORD stylus::get_current_cursor_pos(const COORD& orig_cursor_pos)
 	{
 		COORD cursor_pos = console::get_cursor_pos(this->idx);
@@ -258,5 +262,26 @@ namespace console
 			static_cast<SHORT>(cursor_pos.X + orig_cursor_pos.X),
 			static_cast<SHORT>(cursor_pos.Y + orig_cursor_pos.Y)
 		};
+	}
+
+	stylus::RTP_COORD stylus::calc_render_token_pos_coord(const std::vector<lex::token>& tokens, const size_t& cursor_pos)
+	{
+		if (cursor_pos == 0)
+			return {0, 0};
+
+		size_t token_idx = 0, char_idx = 0;
+		for (std::vector<lex::token>::size_type i = 0; i < tokens.size(); i++)
+		{
+			token_idx = i;
+			char_idx += tokens[i].name.size();
+
+			if (char_idx >= cursor_pos)
+			{
+				char_idx -= cursor_pos;
+				char_idx = tokens[i].name.size() - char_idx;
+				break;
+			}
+		}
+		return {token_idx, char_idx};
 	}
 }

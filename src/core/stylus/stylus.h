@@ -16,9 +16,16 @@ namespace console
 		std::vector<std::string> history;
 
 	private:
+		// Render Token Position COORD
+		struct RTP_COORD // from which token to render
+		{
+			size_t t; // from which token
+			size_t c; // from which char in the above token
+		};
+
 		console::color get_token_color(const lex::token_type& type);
-		void render_token(const lex::token& token, const console::color &fore, const bool& render_char=true);
 		COORD get_current_cursor_pos(const COORD& orig_cursor_pos);
+		RTP_COORD calc_render_token_pos_coord(const std::vector<lex::token>& tokens, const size_t& cursor_pos);
 
 	private:
 		std::vector<std::string>::size_type h_idx; // history index
