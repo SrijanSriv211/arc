@@ -43,7 +43,7 @@ namespace console
 
     namespace errors
     {
-        std::string throw_error(const std::string& message, const std::string& name_of_error);
+        std::string throw_error(const std::string& message, const std::string& name_of_error, const bool& endl=true);
         std::string runtime(const std::string& command, const std::string& message);
         std::string syntax(const std::string& message);
     };

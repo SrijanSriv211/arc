@@ -5,10 +5,10 @@ namespace console
 {
     namespace errors
     {
-        std::string throw_error(const std::string& message, const std::string& name_of_error)
+        std::string throw_error(const std::string& message, const std::string& name_of_error, const bool& endl)
         {
             console::print(name_of_error + " error", console::color::BLACK, console::color::LIGHT_RED, false);
-            console::print(": " + message, console::color::WHITE);
+            console::print(": " + message, console::color::WHITE, endl);
 
             return name_of_error + " error: " + message;
         }
