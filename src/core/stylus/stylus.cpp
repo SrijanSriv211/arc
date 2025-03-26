@@ -4,28 +4,10 @@
 #include "strings/strings.h"
 #include "array/array.h"
 
-bool is_ctrl_c_pressed = false;
-
-// https://learn.microsoft.com/en-us/windows/console/registering-a-control-handler-function
-BOOL WINAPI ctrl_handler(DWORD fdw_ctrl_type)
-{
-    if (fdw_ctrl_type == CTRL_C_EVENT)
-	{
-		console::errors::throw_error("Emergency exit arc ", "Keyboard interrupt", false);
-		console::print("(press any key)", console::color::GRAY, false);
-		is_ctrl_c_pressed = true;
-        return true;
-	}
-
-	return false;
-}
-
 namespace console
 {
 	stylus::stylus()
 	{
-		SetConsoleCtrlHandler(ctrl_handler, TRUE);
-
 		this->history = {};
 		this->h_idx = 0;
 	}
@@ -34,8 +16,6 @@ namespace console
 	{
 		this->idx = 0;
 		this->input = "";
-		this->r_input = "";
-		bool moved_in_history = false;
 
 		COORD orig_cursor_pos = console::get_cursor_pos();
 		std::vector<lex::token> tokens = {};
@@ -51,17 +31,8 @@ namespace console
 			DWORD modifier_state = console::get_modifier_state(key_event);
 			int virtual_key_code = key_event.wVirtualKeyCode;
 
-			if (is_ctrl_c_pressed)
-			{
-				this->input = ";";
-				this->idx = this->input.size();
-				std::cout << std::endl;
-				is_ctrl_c_pressed = false;
-				break;
-			}
-
             // enter
-            else if (virtual_key_code == VK_RETURN)
+            if (virtual_key_code == VK_RETURN)
 			{
 				this->idx = this->input.size();
 				std::cout << std::endl;
@@ -89,12 +60,16 @@ namespace console
 						chunk_len = this->idx - start_idx;
 					}
 
+					std::string old_input = this->input;
 					this->idx -= chunk_len;
 					this->input.erase(this->idx, chunk_len);
 
 					COORD current_cursor_pos = this->get_current_cursor_pos(orig_cursor_pos);
 					console::set_cursor_pos(current_cursor_pos);
-					std::cout << std::string(this->input.size() - this->idx + chunk_len, '-');
+					this->render_tokens(this->idx);
+					std::cout << std::string(old_input.size() - this->input.size(), ' ');
+
+					current_cursor_pos = this->get_current_cursor_pos(orig_cursor_pos);
 					console::set_cursor_pos(current_cursor_pos);
 				}
             }
@@ -123,6 +98,7 @@ namespace console
 					COORD current_cursor_pos = this->get_current_cursor_pos(orig_cursor_pos);
 					console::set_cursor_pos(current_cursor_pos);
 				}
+				continue;
 			}
 
 			else if (virtual_key_code == VK_RIGHT)
@@ -148,6 +124,7 @@ namespace console
 					COORD current_cursor_pos = this->get_current_cursor_pos(orig_cursor_pos);
 					console::set_cursor_pos(current_cursor_pos);
 				}
+				continue;
 			}
 
 			else if (virtual_key_code == VK_UP && !array::is_empty(this->history))
@@ -162,14 +139,18 @@ namespace console
 				if (this->input == this->history[this->h_idx])
 					continue;
 
-				console::set_cursor_pos(orig_cursor_pos);
-				std::cout << std::string(this->input.size(), '-');
-				console::set_cursor_pos(orig_cursor_pos);
-
-				this->r_input = "";
+				const std::string old_input = this->input;
 				this->input = this->history[this->h_idx];
 				this->idx = this->input.size();
-				moved_in_history = true;
+
+				console::set_cursor_pos(orig_cursor_pos);
+				this->render_tokens(0);
+
+				if (old_input.size() > this->input.size())
+					std::cout << std::string(old_input.size() - this->input.size(), ' ');
+
+				COORD current_cursor_pos = this->get_current_cursor_pos(orig_cursor_pos);
+				console::set_cursor_pos(current_cursor_pos);
 			}
 
 			else if (virtual_key_code == VK_DOWN && !array::is_empty(this->history))
@@ -184,32 +165,33 @@ namespace console
 				if (this->input == this->history[this->h_idx])
 					continue;
 
-				console::set_cursor_pos(orig_cursor_pos);
-				std::cout << std::string(this->input.size(), '-');
-				console::set_cursor_pos(orig_cursor_pos);
-
-				this->r_input = "";
+				const std::string old_input = this->input;
 				this->input = this->history[this->h_idx];
 				this->idx = this->input.size();
-				moved_in_history = true;
+
+				console::set_cursor_pos(orig_cursor_pos);
+				this->render_tokens(0);
+
+				if (old_input.size() > this->input.size())
+					std::cout << std::string(old_input.size() - this->input.size(), ' ');
+
+				COORD current_cursor_pos = this->get_current_cursor_pos(orig_cursor_pos);
+				console::set_cursor_pos(current_cursor_pos);
 			}
 
             // regular character input
             else if (key_event.uChar.AsciiChar && isprint(key_event.uChar.AsciiChar))
 			{
 				this->input.insert(this->idx, 1, key_event.uChar.AsciiChar);
-				this->idx++;
 
 				COORD current_cursor_pos = this->get_current_cursor_pos(orig_cursor_pos);
 				console::set_cursor_pos(current_cursor_pos);
-				std::cout << std::string(this->r_input.size() - this->idx, '-');
+				this->render_tokens(this->idx);
+
+				this->idx++;
+				current_cursor_pos = this->get_current_cursor_pos(orig_cursor_pos);
 				console::set_cursor_pos(current_cursor_pos);
 			}
-
-			else
-				continue;
-
-			this->r_input = this->input;
 		}
 
 		tokens = lex::tokenize(this->input);
@@ -277,5 +259,20 @@ namespace console
 			}
 		}
 		return {token_idx, char_idx};
+	}
+
+	void stylus::render_tokens(const size_t& start_pos)
+	{
+		std::vector<lex::token> tokens = lex::tokenize(this->input, false);
+		RTP_COORD coord = this->calc_render_token_pos_coord(tokens, start_pos);
+
+		for (std::vector<lex::token>::size_type i = coord.t; i < tokens.size(); i++)
+		{
+			std::string token_name = tokens[i].name;
+			if (i == coord.t)
+				token_name = token_name.substr(coord.c);
+
+			console::print(token_name, (i == 0) ? console::color::LIGHT_WHITE : this->get_token_color(tokens[i].type), false);
+		}
 	}
 }
