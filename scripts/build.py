@@ -112,6 +112,9 @@ if not os.path.isdir(CONFIG["OUTPATH"]):
     os.makedirs(CONFIG["OUTPATH"])
 
 if len(sys.argv) <= 1:
+    # precompile files
+    [system(cmd) for path, cmd in CONFIG["PRECOMPILES"] if not os.path.isfile(path)]
+
     # get all the untracked files
     cpp_files = get_files(CONFIG["SRC_PATH"], (".cpp", ".c"))
     files_to_compile, files_to_delete = get_untracked_files(cpp_files)
@@ -133,9 +136,6 @@ if len(sys.argv) <= 1:
         elif filename.endswith(".c"):
             os.system(f"gcc -c {filename} {COMMON} -o {objname}")
     print() if files_to_compile else None
-
-    # precompile files
-    [system(cmd) for path, cmd in CONFIG["PRECOMPILES"] if not os.path.isfile(path)]
 
     # link object files together and compile the exe
     obj_files = get_files("obj", (".o"))
