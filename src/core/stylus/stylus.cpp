@@ -77,7 +77,22 @@ namespace console
 			{
 				if (this->idx > 0)
 				{
-					this->idx--;
+					// chunk len to jump left
+					size_t chunk_len = 1;
+
+					// ctrl+left
+					if (modifier_state & (LEFT_CTRL_PRESSED | RIGHT_CTRL_PRESSED))
+					{
+						size_t start_idx = this->idx;
+						while (!this->input.empty() && this->input[start_idx - 1] == ' ' && start_idx > 0)
+							start_idx--;
+
+						while (!this->input.empty() && this->input[start_idx - 1] != ' ' && start_idx > 0)
+							start_idx--;
+						chunk_len = this->idx - start_idx;
+					}
+
+					this->idx -= chunk_len;
 
 					COORD current_cursor_pos = this->get_current_cursor_pos(orig_cursor_pos);
 					console::set_cursor_pos(current_cursor_pos);
@@ -89,7 +104,21 @@ namespace console
 			{
 				if (this->idx < this->input.size())
 				{
-					this->idx++;
+					// chunk len to jump right
+					size_t chunk_len = 1;
+
+					// ctrl+left
+					if (modifier_state & (LEFT_CTRL_PRESSED | RIGHT_CTRL_PRESSED))
+					{
+						chunk_len = 0;
+						while (!this->input.empty() && this->input[chunk_len - 1] == ' ' && chunk_len < this->input.size())
+							chunk_len++;
+
+						while (!this->input.empty() && this->input[chunk_len - 1] != ' ' && chunk_len < this->input.size())
+							chunk_len++;
+					}
+
+					this->idx += chunk_len;
 
 					COORD current_cursor_pos = this->get_current_cursor_pos(orig_cursor_pos);
 					console::set_cursor_pos(current_cursor_pos);
@@ -101,6 +130,10 @@ namespace console
 			{
 				if (this->h_idx > 0)
 					this->h_idx--;
+
+				// ctrl+up to move to the first command in history
+				if (modifier_state & (LEFT_CTRL_PRESSED | RIGHT_CTRL_PRESSED))
+					this->h_idx = 0;
 
 				if (this->input == this->history[this->h_idx])
 					continue;
@@ -119,6 +152,10 @@ namespace console
 			{
 				if (this->h_idx < this->history.size() - 1)
 					this->h_idx++;
+
+				// ctrl+down to move to the latest command in history
+				if (modifier_state & (LEFT_CTRL_PRESSED | RIGHT_CTRL_PRESSED))
+					this->h_idx = this->history.size() - 1;
 
 				if (this->input == this->history[this->h_idx])
 					continue;
@@ -186,8 +223,7 @@ namespace console
 			this->h_idx = this->history.size() - 1;
 		}
 		std::cout << "[" << this->input << "]\n";
-		return {};
-		// return tokens_s;
+		return tokens_s;
 	}
 
     // Color mapping for different token types
