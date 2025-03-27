@@ -74,6 +74,65 @@ namespace functions
         console::print(strings::join("\n", details), console::color::LIGHT_WHITE);
     }
 
+    void get_help()
+    {
+        console::print("The ", console::color::WHITE, false);
+        console::print("help ", console::color::GRAY, false);
+        console::print("command will give you information about any command that is indexed by arc.", console::color::WHITE);
+        console::print("So, to know which commands are indexed and which are not and to change that setting you can open ", console::color::WHITE, false);
+        console::print("`.arc/root/settings.json`.", console::color::GRAY);
+        console::print("And furthermore you can visit ", console::color::WHITE, false);
+        console::print("`https://github.com/SrijanSriv211/arc` ", console::color::GRAY, false);
+        console::print("to get more information about arc ", console::color::WHITE, false);
+        console::print("`settings.json`.", console::color::GRAY);
+        std::cout << std::endl;
+
+        // all keyboard shortcuts in arc
+        std::vector<std::string> shortcut_keys_heading = {
+            "| Shortcut              | Comment                         |",
+            "| --------------------- | --------------------------------|"
+        };
+
+        std::vector<std::string> shortcut_keys = {
+            "| `Backspace`           | Delete previous character       |",
+            "| `UpArrow`             | Previous input in history       |",
+            "| `DownArrow`           | Next input in history           |",
+            "| `LeftArrow`           | Backward one character          |",
+            "| `RightArrow`          | Forward one character           |",
+            "| `Ctrl`+`Backspace`    | Delete previous word            |",
+            "| `Ctrl`+`LeftArrow`    | Backward one word               |",
+            "| `Ctrl`+`RightArrow`   | Forward one word                |",
+            "| `Ctrl`+`UpArrow`      | First input in history          |",
+            "| `Ctrl`+`DownArrow`    | Last input in history           |"
+        };
+
+        console::print("All the supported shortcut keys are the following:", console::color::LIGHT_YELLOW);
+        console::print(strings::join("\n", shortcut_keys_heading), console::color::LIGHT_WHITE);
+        console::print(strings::join("\n", shortcut_keys), console::color::WHITE);
+        std::cout << std::endl;
+
+        // all commands in arc
+        const json model_access = settings::load()["model_access"];
+        std::vector<std::string> help_map_heading = {"envname:", "model_access:", "startlist:", "int. cmds:", "ext. cmds:"};
+        std::vector<std::string> help_map = {
+            settings::load()["envname"].get<std::string>(),
+            model_access[0].get<std::string>(),
+            strings::join(", ", settings::load()["startlist"]),
+            strings::join("\n", functions::get_all_cmds(true)) + "\nserver, -s\nexit, quit, ;",
+            strings::join("\n", settings::get_all_cmds())
+        };
+
+        for (std::vector<std::string>::size_type i = 0; i < help_map.size(); i++)
+        {
+            if (strings::is_empty(help_map[i]))
+                continue;
+            
+            console::print(help_map_heading[i], console::LIGHT_YELLOW);
+            console::print(help_map[i], console::WHITE);
+            std::cout << std::endl;
+        }
+    }
+
     // initialize .arc folder with it's subdirectories
     // this folder will contain all the settings for arc
     void init_folders()
@@ -124,6 +183,7 @@ namespace functions
         {{"cd..", "prevdir", "<<"}, {prevdir, false}},
         {{"cd.", "getdir", ".."}, {getdir, true}},
         {{"init", "-i", ":"}, {init_folders, true}},
+        {{"help", "/?"}, {get_help, true}},
 
         // easter egg commands
         {{"_AOs1000"}, {AOs1000, false}},
@@ -165,15 +225,28 @@ namespace functions
         return {nullptr, true};
     }
 
-    std::vector<std::string> get_all_cmds()
+    // rm_egc -> remove easter egg commands
+    // commands starting with `_` are easter egg commands
+    std::vector<std::string> get_all_cmds(const bool& rm_egc)
     {
         std::vector<std::string> all_cmds = {};
-
         for (const auto& [key, pair] : cmd_func_map)
-            all_cmds.push_back(strings::join(", ", key));
+        {
+            std::string cmds = strings::join(", ", key);
+            if (rm_egc && cmds.starts_with('_'))
+                continue;
+
+            all_cmds.push_back(cmds);
+        }
 
         for (const auto& [key, pair] : cmd_args_func_map)
-            all_cmds.push_back(strings::join(", ", key));
+        {
+            std::string cmds = strings::join(", ", key);
+            if (rm_egc && cmds.starts_with('_'))
+                continue;
+
+            all_cmds.push_back(cmds);
+        }
 
         return all_cmds;
     }
