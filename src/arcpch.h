@@ -9,4 +9,6 @@
 #include <chrono>
 #include <map>
 
+#include <winsock2.h>
+#include <ws2tcpip.h>
 #include <windows.h>
