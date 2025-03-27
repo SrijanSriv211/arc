@@ -12,6 +12,38 @@ namespace console
 		this->h_idx = 0;
 	}
 
+	std::vector<std::string> stylus::read(const std::string& text)
+	{
+		this->input = text;
+		this->idx = text.size();
+
+		std::vector<lex::token> tokens = lex::tokenize(this->input, false);
+
+		if (strings::is_empty(this->input) || tokens.empty() || tokens.size() == 0)
+			return {};
+
+		this->render_tokens(0);
+		std::cout << std::endl;
+
+		// to avoid error message coming before the text is rendered
+		tokens = lex::tokenize(this->input);
+
+		if (strings::is_empty(this->input) || tokens.empty() || tokens.size() == 0)
+			return {};
+
+		// _s means converted to strings
+		std::vector<std::string> tokens_s(tokens.size());
+		std::transform(tokens.begin(), tokens.end(), tokens_s.begin(), [](const lex::token& token) { return token.name; });
+
+		if (!strings::in_array(this->input, this->history))
+		{
+			this->history.push_back(input);
+			this->h_idx = this->history.size() - 1;
+		}
+
+		return tokens_s;
+	}
+
 	std::vector<std::string> stylus::read()
 	{
 		this->idx = 0;
@@ -196,7 +228,7 @@ namespace console
 
 		tokens = lex::tokenize(this->input);
 
-		if (strings::is_empty(input) || tokens.empty() || tokens.size() == 0)
+		if (strings::is_empty(this->input) || tokens.empty() || tokens.size() == 0)
 			return {};
 
 		// _s means converted to strings
@@ -208,9 +240,7 @@ namespace console
 			this->history.push_back(input);
 			this->h_idx = this->history.size() - 1;
 		}
-		std::cout << "     [" << this->input << "]\n";
-		return {};
-		// return tokens_s;
+		return tokens_s;
 	}
 
     // Color mapping for different token types

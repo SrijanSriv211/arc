@@ -10,6 +10,7 @@ namespace console
 	public:
 		stylus();
 		std::vector<std::string> read();
+		std::vector<std::string> read(const std::string& text);
 
 	public:
 		std::string input;
