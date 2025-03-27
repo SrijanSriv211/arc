@@ -80,7 +80,7 @@ namespace functions
         console::print("help ", console::color::GRAY, false);
         console::print("command will give you information about any command that is indexed by arc.", console::color::WHITE);
         console::print("So, to know which commands are indexed and which are not and to change that setting you can open ", console::color::WHITE, false);
-        console::print("`.arc/root/settings.json`.", console::color::GRAY);
+        console::print("`.arc/settings.json`.", console::color::GRAY);
         console::print("And furthermore you can visit ", console::color::WHITE, false);
         console::print("`https://github.com/SrijanSriv211/arc` ", console::color::GRAY, false);
         console::print("to get more information about arc ", console::color::WHITE, false);
@@ -113,9 +113,10 @@ namespace functions
 
         // all commands in arc
         const json model_access = settings::load()["model_access"];
-        std::vector<std::string> help_map_heading = {"envname:", "model_access:", "startlist:", "int. cmds:", "ext. cmds:"};
+        std::vector<std::string> help_map_heading = {"envname:", "localhost:", "model_access:", "startlist:", "int. cmds:", "ext. cmds:"};
         std::vector<std::string> help_map = {
             settings::load()["envname"].get<std::string>(),
+            std::to_string(settings::load()["localhost"].get<int>()),
             model_access[0].get<std::string>(),
             strings::join(", ", settings::load()["startlist"]),
             strings::join("\n", functions::get_all_cmds(true)) + "\nserver, -s\nexit, quit, ;",

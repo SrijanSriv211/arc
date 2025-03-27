@@ -143,7 +143,7 @@ namespace arc
 
         // curl -X POST http://127.0.0.1:8000 -d "shout Hello world!"
         if (return_code == -1)
-            start_server("127.0.0.1", 8000);
+            start_server("127.0.0.1", settings::load()["localhost"]);
 
         SetConsoleCP(code_page); // reset code page to the original one.
         return 0;

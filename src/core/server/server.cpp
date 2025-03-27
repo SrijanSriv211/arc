@@ -131,6 +131,9 @@ void cleanup(SOCKET client_socket, SOCKET server_socket)
 // main server loop to handle incoming connections and requests
 int start_server(const std::string& ip_address, const int& port)
 {
+    // clear console before moving on
+    arc::clear_console();
+
 	if (!initialize_winsock())
 		return -1; // -1 means error
 
