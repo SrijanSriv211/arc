@@ -151,12 +151,22 @@ namespace arc
 
     void run_startlist()
     {
+        console::stylus styl = console::stylus();
         std::vector<std::string> startlist = settings::load()["startlist"];
+
         if (array::is_empty(startlist))
             return;
 
         for (const std::string& filename : startlist)
         {
+            if (filename.starts_with("arc~>"))
+            {
+				arc::print_prompt();
+				std::vector<std::string> tokens = styl.read(strings::trim(filename.substr(5)));
+				arc::exec_tokens(tokens);
+                continue;
+            }
+
             console::print("> ", console::color::GRAY, false);
             console::print(filename, console::color::LIGHT_WHITE);
             std::system(filename.c_str());
