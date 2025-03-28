@@ -13,8 +13,9 @@ namespace lex
 		ANGLE, 				// 5+1
 		FLAG, 				// 7
 		MATH, 				// 8
-		DOT, 				// 9
-		ID	 				// 10
+		PIPE, 				// 9
+		DOT, 				// 10
+		ID	 				// 11
 	};
 
 	struct token

@@ -41,4 +41,25 @@ namespace filesystem
             console::errors::throw_error(e.what(), "C++ file system IO");
         }
     }
+
+    void del(const std::filesystem::path& filepath)
+    {
+        // check if the file exists
+        if (!std::filesystem::exists(filepath))
+        {
+            console::errors::throw_error("Cannot find file.", "File system IO");
+            return;
+        }
+
+        // change the folder
+        try
+        {
+            std::filesystem::remove(filepath);
+        }
+
+        catch(const std::exception& e)
+        {
+            console::errors::throw_error(e.what(), "C++ file system IO");
+        }
+    }
 }

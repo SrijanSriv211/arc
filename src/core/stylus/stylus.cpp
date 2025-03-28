@@ -336,6 +336,7 @@ namespace console
             case lex::token_type::WHITESPACE: 	return console::color::WHITE;
             case lex::token_type::ID: 			return console::color::WHITE;
             case lex::token_type::DOT: 			return console::color::WHITE;
+            case lex::token_type::PIPE: 		return console::color::WHITE;
             default:                          	return console::color::WHITE;
         }
     }

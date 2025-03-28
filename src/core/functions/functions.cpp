@@ -154,14 +154,22 @@ namespace functions
         foldersystem::change("..");
     }
 
+    // if the string starts and ends with any of these (", ', `), then crop these from the string
+    std::string unstring(const std::string& str)
+    {
+        if (!(strings::startswith_any(str, {"\"", "'", "`"}) & strings::endswith_any(str, {"\"", "'", "`"})))
+            return str;
+        return str.substr(1, str.size() - 2);
+    }
+
     void chdir(const std::vector<std::string>& path)
     {
-        std::filesystem::current_path(strings::trim(strings::join(" ", path)));
+        std::filesystem::current_path(strings::trim(unstring(strings::join(" ", path))));
     }
 
     void chenv(const std::vector<std::string>& path)
     {
-        if (strings::trim(strings::join(" ", path)) == "root")
+        if (strings::trim(unstring(strings::join(" ", path))) == "root")
         {
             arc::env_path = arc::get_root_path();
             return;
@@ -182,6 +190,28 @@ namespace functions
     void cmd(const std::vector<std::string>& args)
     {
         std::system(strings::trim(strings::join(" ", args)).c_str());
+    }
+
+    void touch(const std::vector<std::string>& arr)
+    {
+        std::string name = strings::trim(unstring(strings::join(" ", arr)));
+        if (name.ends_with("/") or name.ends_with("\\"))
+        {
+            foldersystem::create(name);
+            return;
+        }
+        filesystem::create(name);
+    }
+
+    void del(const std::vector<std::string>& arr)
+    {
+        std::string name = strings::trim(unstring(strings::join(" ", arr)));
+        if (name.ends_with("/") or name.ends_with("\\"))
+        {
+            foldersystem::del(name);
+            return;
+        }
+        filesystem::del(name);
     }
 
     // { [...] : [...(), true/false] }; if true then "continue" the loop else don't
@@ -208,6 +238,8 @@ namespace functions
     // { [...] : [...(...), true/false] }
     std::map<std::vector<std::string>, std::pair<std::function<void(const std::vector<std::string>&)>, bool>> cmd_args_func_map = {
         {{"env", "chenv", "..."}, {chenv, true}},
+        {{"touch", "create", "tch", "crt", "|"}, {touch, true}},
+        {{"del", "rm", "delete", "remove", "||"}, {del, true}},
         {{"cd", "chdir", ">>"}, {chdir, false}},
         {{"start", "call", ">"}, {cmd, false}},
     };
