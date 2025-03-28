@@ -1,8 +1,11 @@
 #include "arcpch.h"
 #include "stylus.h"
 
+#include "functions/functions.h"
+#include "settings/settings.h"
 #include "strings/strings.h"
 #include "array/array.h"
+#include "math/math.h"
 
 namespace console
 {
@@ -47,7 +50,9 @@ namespace console
 	std::vector<std::string> stylus::read()
 	{
 		this->idx = 0;
+		this->s_idx = 0;
 		this->input = "";
+		this->input_suggestion = "";
 
 		COORD orig_cursor_pos = console::get_cursor_pos();
 		std::vector<lex::token> tokens = {};
@@ -69,6 +74,29 @@ namespace console
 				this->idx = this->input.size();
 				std::cout << std::endl;
                 break;
+			}
+
+			else if (virtual_key_code == VK_TAB)
+			{
+				std::vector<std::string> all_cmds = array::flat({array::flat(settings::get_all_cmds_list()), array::flat(functions::get_all_cmds_list(true))});
+				all_cmds.insert(all_cmds.end(), this->history.begin(), this->history.end());
+				std::vector<std::string> suggestions_list = {""};
+
+				for (const std::string& cmd : all_cmds)
+				{
+					if (!cmd.starts_with(this->input))
+						continue;
+					suggestions_list.push_back(cmd);
+				}
+
+				if (suggestions_list.size() == 1)
+					continue;
+
+				// this->input_suggestion = suggestions_list[this->s_idx].substr(this->input.size());
+				this->input_suggestion = suggestions_list[this->s_idx];
+				std::cout << this->s_idx << " :[" << this->input_suggestion << "]\n";
+
+				this->s_idx = math::modulo(this->s_idx + 1, suggestions_list.size());
 			}
 
             // backspace

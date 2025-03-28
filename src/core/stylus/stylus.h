@@ -30,7 +30,9 @@ namespace console
 		void render_tokens(const size_t& start_pos);
 
 	private:
-		std::vector<std::string>::size_type h_idx; // history index
+		size_t h_idx; // history index
+		size_t s_idx; // suggestions index
 		size_t idx; // cursor pos index (in terms of length of input)
+		std::string input_suggestion;
 	};
 }
