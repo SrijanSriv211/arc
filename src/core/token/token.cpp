@@ -80,6 +80,19 @@ namespace lex
 				tokens.push_back({tok, lex::token_type::DOT});
 			}
 
+			else if (tok == "|")
+			{
+				i++;
+				while(i < line.size() && line[i] == '|')
+				{
+					tok += line[i];
+					i++;
+				}
+				i--;
+
+				tokens.push_back({tok, lex::token_type::PIPE});
+			}
+
 			else if (strings::any(tok, {"\"", "'", "`"}, true))
 			{
 				char str_literal = tok.front();
@@ -98,7 +111,7 @@ namespace lex
 				i++;
 				while(i < line.size())
 				{
-					if (line[i] == '\\')
+					if (throw_error && line[i] == '\\')
 					{
 						i++;
 
@@ -137,7 +150,6 @@ namespace lex
 					std::cout << std::endl;
 					return {};
 				}
-
 				tokens.push_back({tok, lex::token_type::STRING});
 			}
 
