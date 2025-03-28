@@ -61,6 +61,22 @@ namespace settings
         return all_cmds;
     }
 
+    std::vector<std::vector<std::string>> get_all_cmds_list()
+    {
+        std::vector<std::vector<std::string>> all_cmds = {};
+        json commands = load()["cmd"];
+
+        for (size_t i = 0; i < commands.size(); i++)
+        {
+            if (array::is_empty(array::trim(commands[i]["names"])))
+                continue;
+
+            all_cmds.push_back(array::trim(commands[i]["names"]));
+        }
+
+        return all_cmds;
+    }
+
     int get_command_by_name(const std::string& cmd)
     {
         json commands = load()["cmd"];

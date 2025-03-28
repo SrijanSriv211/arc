@@ -119,7 +119,7 @@ namespace functions
             std::to_string(settings::load()["localhost"].get<int>()),
             model_access[0].get<std::string>(),
             strings::join(", ", settings::load()["startlist"]),
-            strings::join("\n", functions::get_all_cmds(true)) + "\nserver, -s\nexit, quit, ;",
+            strings::join("\n", functions::get_all_cmds(true)),
             strings::join("\n", settings::get_all_cmds())
         };
 
@@ -159,6 +159,12 @@ namespace functions
 
     void chenv(const std::vector<std::string>& path)
     {
+        if (strings::trim(strings::join(" ", path)) == "root")
+        {
+            arc::env_path = arc::get_root_path();
+            return;
+        }
+
         std::string env_path = std::filesystem::current_path().string();
         if (!array::is_empty(path))
         {
@@ -230,7 +236,7 @@ namespace functions
     // commands starting with `_` are easter egg commands
     std::vector<std::string> get_all_cmds(const bool& rm_egc)
     {
-        std::vector<std::string> all_cmds = {};
+        std::vector<std::string> all_cmds = {"exit, quit, ;", "server, -s"};
         for (const auto& [key, pair] : cmd_func_map)
         {
             std::string cmds = strings::join(", ", key);
@@ -247,6 +253,32 @@ namespace functions
                 continue;
 
             all_cmds.push_back(cmds);
+        }
+
+        return all_cmds;
+    }
+
+    // rm_egc -> remove easter egg commands
+    // commands starting with `_` are easter egg commands
+    std::vector<std::vector<std::string>> get_all_cmds_list(const bool& rm_egc)
+    {
+        std::vector<std::vector<std::string>> all_cmds = {{"exit", "quit", ";"}, {"server", "-s"}};
+        for (const auto& [key, pair] : cmd_func_map)
+        {
+            std::string cmds = strings::join(", ", key);
+            if (rm_egc && cmds.starts_with('_'))
+                continue;
+
+            all_cmds.push_back(key);
+        }
+
+        for (const auto& [key, pair] : cmd_args_func_map)
+        {
+            std::string cmds = strings::join(", ", key);
+            if (rm_egc && cmds.starts_with('_'))
+                continue;
+
+            all_cmds.push_back(key);
         }
 
         return all_cmds;
