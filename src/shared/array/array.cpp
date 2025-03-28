@@ -43,4 +43,13 @@ namespace array
         // create new vector with the trimmed elements
         return std::vector<std::string>(first_index, last_index);
     }
+
+    std::vector<std::string> flat(const std::vector<std::vector<std::string>>& arr)
+    {
+        std::vector<std::string> flattened_array = {};
+
+        for (size_t i = 0; i < arr.size(); i++)
+            flattened_array.insert(flattened_array.end(), arr[i].begin(), arr[i].end());
+        return flattened_array;
+    }
 }
