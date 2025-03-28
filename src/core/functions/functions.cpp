@@ -192,26 +192,37 @@ namespace functions
         std::system(strings::trim(strings::join(" ", args)).c_str());
     }
 
-    void touch(const std::vector<std::string>& arr)
+    void touch(const std::vector<std::string>& names)
     {
-        std::string name = strings::trim(unstring(strings::join(" ", arr)));
-        if (name.ends_with("/") or name.ends_with("\\"))
+        std::vector<std::string> n = array::reduce(names);
+        for (std::string& name : n)
         {
-            foldersystem::create(name);
-            return;
+            name = strings::trim(unstring(name));
+            if (name.ends_with("/") or name.ends_with("\\"))
+            {
+                foldersystem::create(name);
+                continue;
+            }
+            filesystem::create(name);
         }
-        filesystem::create(name);
     }
 
-    void del(const std::vector<std::string>& arr)
+    void del(const std::vector<std::string>& names)
     {
-        std::string name = strings::trim(unstring(strings::join(" ", arr)));
-        if (name.ends_with("/") or name.ends_with("\\"))
+        std::vector<std::string> n = array::reduce(names);
+        for (std::string& name : n)
         {
-            foldersystem::del(name);
-            return;
+            if (strings::is_empty(strings::trim(name)))
+                continue;
+
+            name = strings::trim(unstring(name));
+            if (name.ends_with("/") or name.ends_with("\\"))
+            {
+                foldersystem::del(name);
+                continue;
+            }
+            filesystem::del(name);
         }
-        filesystem::del(name);
     }
 
     // { [...] : [...(), true/false] }; if true then "continue" the loop else don't
