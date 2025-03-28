@@ -52,10 +52,11 @@ namespace console
 		this->idx = 0;
 		this->s_idx = 0;
 		this->input = "";
-		this->input_suggestion = "";
 
 		COORD orig_cursor_pos = console::get_cursor_pos();
 		std::vector<lex::token> tokens = {};
+		std::string input_suggestion = "";
+		std::string prev_suggestion = "";
 
 		while (true)
 		{
@@ -71,6 +72,22 @@ namespace console
             // enter
             if (virtual_key_code == VK_RETURN)
 			{
+				// ctrl+enter to select current suggestion
+				if (modifier_state & (LEFT_CTRL_PRESSED | RIGHT_CTRL_PRESSED))
+				{
+					if (strings::is_empty(input_suggestion))
+						continue;
+
+					this->input += input_suggestion;
+					this->render_tokens(this->idx);
+					this->idx = this->input.size();
+
+					input_suggestion = "";
+					prev_suggestion = "";
+					this->s_idx = 0;
+					continue;
+				}
+
 				this->idx = this->input.size();
 				std::cout << std::endl;
                 break;
@@ -80,7 +97,7 @@ namespace console
 			{
 				std::vector<std::string> all_cmds = array::flat({array::flat(settings::get_all_cmds_list()), array::flat(functions::get_all_cmds_list(true))});
 				all_cmds.insert(all_cmds.end(), this->history.begin(), this->history.end());
-				std::vector<std::string> suggestions_list = {""};
+				std::vector<std::string> suggestions_list = {};
 
 				for (const std::string& cmd : all_cmds)
 				{
@@ -88,15 +105,28 @@ namespace console
 						continue;
 					suggestions_list.push_back(cmd);
 				}
+				suggestions_list.push_back("");
 
 				if (suggestions_list.size() == 1)
 					continue;
 
-				// this->input_suggestion = suggestions_list[this->s_idx].substr(this->input.size());
-				this->input_suggestion = suggestions_list[this->s_idx];
-				std::cout << this->s_idx << " :[" << this->input_suggestion << "]\n";
+				this->s_idx = math::modulo(this->s_idx, suggestions_list.size());
+				input_suggestion = suggestions_list[this->s_idx];
 
-				this->s_idx = math::modulo(this->s_idx + 1, suggestions_list.size());
+				if (input_suggestion.size() > 0)
+					input_suggestion = input_suggestion.substr(this->input.size());
+
+				COORD end_of_input = this->get_cursor_pos(orig_cursor_pos, this->input.size());
+				console::set_cursor_pos(end_of_input);
+				this->idx = this->input.size();
+
+				console::print(input_suggestion, console::color::GRAY, false, true);
+				std::cout << std::string(prev_suggestion.size(), ' ');
+
+				console::set_cursor_pos(end_of_input);
+
+				prev_suggestion = input_suggestion;
+				this->s_idx++;
 			}
 
             // backspace
@@ -127,10 +157,13 @@ namespace console
 					COORD current_cursor_pos = this->get_current_cursor_pos(orig_cursor_pos);
 					console::set_cursor_pos(current_cursor_pos);
 					this->render_tokens(this->idx);
-					std::cout << std::string(old_input.size() - this->input.size(), ' ');
+					std::cout << std::string(old_input.size() - this->input.size() + input_suggestion.size(), ' ');
 
 					current_cursor_pos = this->get_current_cursor_pos(orig_cursor_pos);
 					console::set_cursor_pos(current_cursor_pos);
+					input_suggestion = "";
+					prev_suggestion = "";
+					this->s_idx = 0;
 				}
             }
 
@@ -207,10 +240,13 @@ namespace console
 				this->render_tokens(0);
 
 				if (old_input.size() > this->input.size())
-					std::cout << std::string(old_input.size() - this->input.size(), ' ');
+					std::cout << std::string(old_input.size() - this->input.size() + input_suggestion.size(), ' ');
 
 				COORD current_cursor_pos = this->get_current_cursor_pos(orig_cursor_pos);
 				console::set_cursor_pos(current_cursor_pos);
+				input_suggestion = "";
+				prev_suggestion = "";
+				this->s_idx = 0;
 			}
 
 			else if (virtual_key_code == VK_DOWN && !array::is_empty(this->history))
@@ -233,15 +269,30 @@ namespace console
 				this->render_tokens(0);
 
 				if (old_input.size() > this->input.size())
-					std::cout << std::string(old_input.size() - this->input.size(), ' ');
+					std::cout << std::string(old_input.size() - this->input.size() + input_suggestion.size(), ' ');
 
 				COORD current_cursor_pos = this->get_current_cursor_pos(orig_cursor_pos);
 				console::set_cursor_pos(current_cursor_pos);
+				input_suggestion = "";
+				prev_suggestion = "";
+				this->s_idx = 0;
 			}
 
             // regular character input
             else if (key_event.uChar.AsciiChar && isprint(key_event.uChar.AsciiChar))
 			{
+				if (!strings::is_empty(input_suggestion))
+				{
+					COORD current_cursor_pos = this->get_current_cursor_pos(orig_cursor_pos);
+					COORD end_of_input = this->get_cursor_pos(orig_cursor_pos, this->input.size());
+					console::set_cursor_pos(end_of_input);
+					std::cout << std::string(input_suggestion.size(), ' ');
+					console::set_cursor_pos(current_cursor_pos);
+					input_suggestion = "";
+					prev_suggestion = "";
+					this->s_idx = 0;
+				}
+
 				this->input.insert(this->idx, 1, key_event.uChar.AsciiChar);
 
 				COORD current_cursor_pos = this->get_current_cursor_pos(orig_cursor_pos);
@@ -288,6 +339,15 @@ namespace console
             default:                          	return console::color::WHITE;
         }
     }
+
+	COORD stylus::get_cursor_pos(const COORD& orig_cursor_pos, const int& total_dist)
+	{
+		COORD cursor_pos = console::get_cursor_pos(total_dist);
+		return {
+			static_cast<SHORT>(cursor_pos.X + orig_cursor_pos.X),
+			static_cast<SHORT>(cursor_pos.Y + orig_cursor_pos.Y)
+		};
+	}
 
 	COORD stylus::get_current_cursor_pos(const COORD& orig_cursor_pos)
 	{

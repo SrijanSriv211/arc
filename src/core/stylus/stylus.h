@@ -26,6 +26,7 @@ namespace console
 
 		console::color get_token_color(const lex::token_type& type);
 		COORD get_current_cursor_pos(const COORD& orig_cursor_pos);
+		COORD get_cursor_pos(const COORD& orig_cursor_pos, const int& total_dist);
 		RTP_COORD calc_render_token_pos_coord(const std::vector<lex::token>& tokens, const size_t& cursor_pos);
 		void render_tokens(const size_t& start_pos);
 
@@ -33,6 +34,5 @@ namespace console
 		size_t h_idx; // history index
 		size_t s_idx; // suggestions index
 		size_t idx; // cursor pos index (in terms of length of input)
-		std::string input_suggestion;
 	};
 }

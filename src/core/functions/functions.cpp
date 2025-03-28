@@ -94,11 +94,13 @@ namespace functions
         };
 
         std::vector<std::string> shortcut_keys = {
+            "| `Tab`                 | Next autocomplete suggestions   |",
             "| `Backspace`           | Delete previous character       |",
             "| `UpArrow`             | Previous input in history       |",
             "| `DownArrow`           | Next input in history           |",
             "| `LeftArrow`           | Backward one character          |",
             "| `RightArrow`          | Forward one character           |",
+            "| `Ctrl`+`Enter`        | Select current suggestion       |",
             "| `Ctrl`+`Backspace`    | Delete previous word            |",
             "| `Ctrl`+`LeftArrow`    | Backward one word               |",
             "| `Ctrl`+`RightArrow`   | Forward one word                |",
