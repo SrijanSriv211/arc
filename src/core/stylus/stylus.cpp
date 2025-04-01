@@ -12,7 +12,7 @@ namespace console
 	stylus::stylus(const std::vector<std::string>& saves)
 	{
 		this->history = saves;
-		this->h_idx = saves.size();
+		this->h_idx = 0;
 	}
 
 	std::vector<std::string> stylus::read(const std::string& text)
