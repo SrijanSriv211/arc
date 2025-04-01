@@ -142,6 +142,7 @@ namespace functions
     {
         foldersystem::create(".arc");
         filesystem::write(".arc\\settings.json", settings::format);
+        filesystem::create(".arc\\history.txt");
     }
 
     void getdir()

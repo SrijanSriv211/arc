@@ -9,10 +9,10 @@
 
 namespace console
 {
-	stylus::stylus()
+	stylus::stylus(const std::vector<std::string>& saves)
 	{
-		this->history = {};
-		this->h_idx = 0;
+		this->history = saves;
+		this->h_idx = saves.size();
 	}
 
 	std::vector<std::string> stylus::read(const std::string& text)
@@ -97,6 +97,7 @@ namespace console
 			{
 				std::vector<std::string> all_cmds = array::flat({array::flat(settings::get_all_cmds_list()), array::flat(functions::get_all_cmds_list(true))});
 				all_cmds.insert(all_cmds.end(), this->history.begin(), this->history.end());
+				all_cmds = array::unique(all_cmds);
 				std::vector<std::string> suggestions_list = {};
 
 				for (const std::string& cmd : all_cmds)

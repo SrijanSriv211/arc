@@ -130,13 +130,21 @@ namespace arc
             SetConsoleOutputCP(65001);
         }
 
-        console::stylus s = console::stylus();
+        // create history file
+        const std::filesystem::path history_path = arc::env_path + "\\.arc\\history.txt";
+        filesystem::create(history_path);
+
+        console::stylus s = console::stylus(settings::load_history());
         int return_code = 1;
+
         while(return_code)
         {
             arc::print_prompt();
             std::vector<std::string> tokens = s.read();
+            settings::save_history(s.history);
+
             return_code = arc::exec_tokens(tokens);
+
             if (return_code == 0 || return_code == -1)
                 break;
         }
@@ -151,7 +159,7 @@ namespace arc
 
     void run_startlist()
     {
-        console::stylus styl = console::stylus();
+        console::stylus styl = console::stylus({});
         std::vector<std::string> startlist = settings::load()["startlist"];
 
         if (array::is_empty(startlist))

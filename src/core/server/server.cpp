@@ -143,7 +143,7 @@ int start_server(const std::string& ip_address, const int& port)
 		return -1;
 
     int return_code = 1;
-	console::stylus styl = console::stylus();
+	console::stylus styl = console::stylus({});
     while (return_code == 1)
     {
         SOCKET client_socket = accept_client(server_socket);
