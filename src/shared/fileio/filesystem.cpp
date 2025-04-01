@@ -42,6 +42,38 @@ namespace filesystem
         }
     }
 
+    std::vector<std::string> readlines(const std::filesystem::path& filepath)
+    {
+        // check if the file exists
+        if (!std::filesystem::exists(filepath))
+        {
+            console::errors::throw_error("Cannot find file.", "File system IO");
+            return {};
+        }
+
+        // create the folder
+        std::vector<std::string> lines = {};
+        try
+        {
+            std::string line;
+            std::fstream file;
+            file.open(filepath);
+
+            if (!file)
+                console::errors::throw_error("Unable to open file.", "File system IO");
+
+            while (std::getline(file, line))
+                lines.push_back(line);
+            file.close();
+        }
+
+        catch(const std::exception& e)
+        {
+            console::errors::throw_error(e.what(), "C++ file system IO");
+        }
+        return lines;
+    }
+
     void del(const std::filesystem::path& filepath)
     {
         // check if the file exists
