@@ -204,11 +204,13 @@ namespace console
 					// ctrl+left
 					if (modifier_state & (LEFT_CTRL_PRESSED | RIGHT_CTRL_PRESSED))
 					{
+						const std::string temp_input = this->input.substr(this->idx);
 						chunk_len = 0;
-						while (!this->input.empty() && this->input[chunk_len - 1] == ' ' && chunk_len < this->input.size())
+
+						while (!temp_input.empty() && temp_input[chunk_len - 1] == ' ' && chunk_len < temp_input.size())
 							chunk_len++;
 
-						while (!this->input.empty() && this->input[chunk_len - 1] != ' ' && chunk_len < this->input.size())
+						while (!temp_input.empty() && temp_input[chunk_len - 1] != ' ' && chunk_len < temp_input.size())
 							chunk_len++;
 					}
 
