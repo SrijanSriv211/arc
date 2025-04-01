@@ -21,6 +21,24 @@ namespace array
         return result;
     }
 
+    // get only unique elements from the array
+    std::vector<std::string> unique(const std::vector<std::string>& arr)
+    {
+        if (is_empty(arr))
+            return {};
+
+        std::vector<std::string> result = arr;
+
+        // sort the array to group duplicates together
+        std::sort(result.begin(), result.end());
+        // move unique elements to the front
+        std::vector<std::string>::iterator last = std::unique(result.begin(), result.end());
+        // remove the remaining elements (duplicates)
+        result.erase(last, result.end());
+
+        return result;
+    }
+
     // https://stackoverflow.com/a/70991343/18121288
     // https://github.com/SrijanSriv211/AOs/blob/AOs-2.7/src/shared/Utils/Array.cs#L52
     std::vector<std::string> trim(const std::vector<std::string>& arr)
