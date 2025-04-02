@@ -8,7 +8,7 @@ namespace console
 	class stylus
 	{
 	public:
-		stylus(const std::vector<std::string>& saves);
+		stylus();
 		std::vector<std::string> read();
 		std::vector<std::string> read(const std::string& text);
 

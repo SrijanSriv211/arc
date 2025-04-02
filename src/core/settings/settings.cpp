@@ -45,36 +45,6 @@ namespace settings
         return json::parse(f);
     }
 
-    std::vector<std::string> load_history()
-    {
-        std::filesystem::path history_path = arc::env_path + "\\.arc\\history.txt";
-        if (!std::filesystem::exists(history_path))
-        {
-            history_path = arc::get_root_path() + "\\history.txt";
-            if (!std::filesystem::exists(history_path))
-                return {};
-
-            return filesystem::readlines(history_path);
-        }
-
-        return filesystem::readlines(history_path);
-    }
-
-    void save_history(const std::vector<std::string>& history)
-    {
-        std::filesystem::path history_path = arc::env_path + "\\.arc\\history.txt";
-        if (!std::filesystem::exists(history_path))
-        {
-            history_path = arc::get_root_path() + "\\history.txt";
-            if (!std::filesystem::exists(history_path))
-                return;
-
-            return filesystem::write(history_path, strings::join("\n", history));
-        }
-
-        return filesystem::write(history_path, strings::join("\n", history));
-    }
-
     std::vector<std::string> get_all_cmds()
     {
         std::vector<std::string> all_cmds = {};
