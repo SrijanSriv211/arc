@@ -52,10 +52,10 @@ namespace arc
         if (current_path != std::filesystem::current_path().string())
         {
             current_path = std::filesystem::current_path().string();
-            console::print(std::filesystem::current_path().string(), console::color::LIGHT_WHITE);
+            console::print(std::filesystem::current_path().string(), console::color::LIGHT_YELLOW);
         }
 
-        console::print(settings::load()["envname"], console::color::LIGHT_RED, false);
+        console::print(settings::load()["envname"], console::color::LIGHT_BLUE, false);
         console::print("~> ", console::color::GRAY, false);
     }
 
